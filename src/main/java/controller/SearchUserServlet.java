@@ -10,7 +10,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import model.StudentReg;
 import model.UserBean;
 
 @WebServlet("/SearchUserServlet")
@@ -27,23 +26,19 @@ public class SearchUserServlet extends HttpServlet {
 		String id = req.getParameter("id");
 		String name = req.getParameter("name");
 
-		List<UserBean> students = (ArrayList<UserBean>) req.getServletContext().getAttribute("stuApp");
+		List<UserBean> users = (ArrayList<UserBean>) req.getServletContext().getAttribute("userApp");
 
-		List<UserBean> foundUser = new ArrayList<>();
+		List<UserBean> foundusers= new ArrayList<>();
 
 		boolean shouldRedirect = false;
 
-		if (students != null) {
+		if (users != null) {
 			if (!id.equals("") && name.equals("")) {
-				foundUser = this.findyById(students, id);
-			}
-
-			else if (id.equals("") && !name.equals("")) {
-				foundUser = this.findByName(students, name);
-			}
-
-			else if (!id.equals("") && !name.equals("")) {
-				foundUser = this.findByIdAndName(students, id, name);
+				foundusers = this.findyById(users, id);
+			}else if (id.equals("") && !name.equals("")) {
+				foundusers = this.findByName(users, name);
+			} else if (!id.equals("") && !name.equals("")) {
+				foundusers = this.findByIdAndName(users, id, name);
 			} else {
 				shouldRedirect = true;
 			}
@@ -54,48 +49,40 @@ public class SearchUserServlet extends HttpServlet {
 		}
 
 		else {
-			req.setAttribute("userApp", foundUser);
+			req.setAttribute("userApp", foundusers);
 			req.getRequestDispatcher("USR003.jsp").forward(req, res);
 		}
 
 	}
 
-	public List<UserBean> findyById(List<UserBean> users, String id) {
-		List<UserBean> foundUser = new ArrayList<>();
+	public List<UserBean> findyById(List<UserBean> students, String id) {
+		List<UserBean> foundStudents = new ArrayList<>();
+		for (UserBean student : students) {
+			if (student.getUserId().contains(id)) {
+				foundStudents.add(student);
+			}
+		}
+		return foundStudents;
+	}
 
-		for (UserBean user : users) {
-			if (user.getUserId().contains(id)) {
-				foundUser.add(user);
+	public List<UserBean> findByName(List<UserBean> students, String name) {
+		List<UserBean> foundStudents = new ArrayList<>();
+		for (UserBean student : students) {
+			if (student.getUserName().contains(name)) {
+				foundStudents.add(student);
 			}
 		}
 
-		return foundUser;
+		return foundStudents;
 	}
-
-	public List<UserBean> findByName(List<UserBean> users, String name) {
-		List<UserBean> foundUser = new ArrayList<>();
-
-		for (UserBean user : users) {
-			if (user.getUserName().contains(name)) {
-				foundUser.add(user);
+	public List<UserBean> findByIdAndName(List<UserBean> students, String id, String name) {
+		List<UserBean> foundStudents = new ArrayList<>();
+		for (UserBean student : students) {
+			if (student.getUserId().contains(id) && student.getUserName().contains(name)) {
+				foundStudents.add(student);
 			}
 		}
-
-		return foundUser;
-
-	}
-
-	public List<UserBean> findByIdAndName(List<UserBean> users, String id, String name) {
-		List<UserBean> foundUser = new ArrayList<>();
-
-		for (UserBean user : users) {
-			if (user.getUserId().contains(id) && user.getUserName().contains(name)) {
-				foundUser.add(user);
-			}
-		}
-
-		return foundUser;
+		return foundStudents;
 
 	}
-
 }
